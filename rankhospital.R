@@ -1,19 +1,8 @@
-## Output : Hospital Name with lowest 30-day death for input outcome.
-## Input : State 2digit code, Outcome
-
-## [2] "Hospital.Name" 
-## [7] "State" 
-## [11] "Hospital.30.Day.Death..Mortality..Rates.from.Heart.Attack" 
-## [17] "Hospital.30.Day.Death..Mortality..Rates.from.Heart.Failure" 
-## [23] "Hospital.30.Day.Death..Mortality..Rates.from.Pneumonia" 
-
-
-
-best <- function(state, outcome="heart attack") {
+rankhospital <- function(state, outcome, num = "best") {
     ## Read outcome data
     ## Check that state and outcome are valid
-    ## Return hospital name in that state with lowest 30-day death
-    ## rate
+    ## Return hospital name in that state with the given rank
+    ## 30-day death rate
     
     intOutcome<-0
     
@@ -29,12 +18,22 @@ best <- function(state, outcome="heart attack") {
         ##return("Error: Use one of the following inputs : heart attack, heart failure, pneumonia")
     }
     
+    iOrder<-FALSE
+    iRank<-1
+    if (num=="best")
+        iOrder<-FALSE
+    else if(num=="worst")
+        iOrder<- TRUE
+    else {        
+        iRank<-as.numeric(num)
+        if (is.na(iRank)) {stop("invalid rank.")}
+    }
     
     myfiledata <- read.csv("outcome-of-care-measures.csv", header=TRUE, sep=",", colClasses = "character")
     
     ## Filter data to required Outcome Columns
     outcome_data<-myfiledata[,c(2, 7, intOutcome)]
-
+    
     ## Check if State Exists
     state<-toupper(state)
     if (any(outcome_data[,2]==state)==FALSE){
@@ -43,18 +42,15 @@ best <- function(state, outcome="heart attack") {
     
     ## Filter data for required State
     outcome_data<-outcome_data[outcome_data[,2]==state,]
-
+    
     ## Filter data for NA
     outcome_data<-outcome_data[outcome_data[,3]!="Not Available",]
     
     ## Convert data to Numeric
     outcome_data[,3]<-as.numeric(outcome_data[,3])
-    ##outcome_data<-outcome_data[complete.cases(outcome_data),] 
     
-    ## Output the Hospital Name
-    outcome_data[outcome_data[,3]==min(outcome_data[,3],na.rm=TRUE),1]
+    outcome_data<-outcome_data[order(outcome_data[,3], outcome_data[,1] ,decreasing=iOrder),]
     
-    ## Sort Hospitals in Alpha order
-    ## Return the first if there are many.
-    
+    outcome_data[iRank,1]
+
 }
