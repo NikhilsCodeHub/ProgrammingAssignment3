@@ -1,0 +1,18 @@
+x <- 1:10#
+if(x > 5) {#
+        x <- 0#
+}
+x <- 5#
+y <- if(x < 3) {#
+        NA#
+} else {#
+        10#
+}
+y
+outcome
+getwd()
+setwd("/Users/nikhil/GitHub/DataScience/rProg/ProgrammingAssignment3")
+outcome <- read.csv("outcome-of-care-measures.csv", colClasses = "character")
+hist(outcome[,11])
+outcome[,11]<-as.numeric(outcome[,11])
+hist(outcome[,11])
