@@ -33,6 +33,11 @@ best <- function(state, outcome="heart attack") {
     
     ## Filter data to required Outcome Columns
     outcome_data<-myfiledata[,c(2, 7, intOutcome)]
+
+    ## Check is State Exists
+    if (any(outcome_data[,2]==state)==FALSE){
+        stop("invalid state")
+    }
     
     ## Filter data for required State
     outcome_data<-outcome_data[outcome_data[,2]==state,]
