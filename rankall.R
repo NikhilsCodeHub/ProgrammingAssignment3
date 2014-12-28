@@ -5,6 +5,8 @@ rankall <- function(outcome, num = "best") {
     ## Return a data frame with the hospital names and the
     ## (abbreviated) state name
     
+    
+    ## Initialize outcome values
     intOutcome<-0
     
     if (outcome=="heart attack")
@@ -19,6 +21,7 @@ rankall <- function(outcome, num = "best") {
         ##return("Error: Use one of the following inputs : heart attack, heart failure, pneumonia")
     }
     
+    ## Initialize and set sort order and Rank Number
     iOrder<-FALSE
     iRank<-1
     if (num=="best")
@@ -30,6 +33,7 @@ rankall <- function(outcome, num = "best") {
         if (is.na(iRank)) {stop("invalid rank.")}
     }
     
+    ## Read data from file
     myfiledata <- read.csv("outcome-of-care-measures.csv", header=TRUE, sep=",", colClasses = "character")
     
     ## Filter data to required Outcome Columns
@@ -47,12 +51,16 @@ rankall <- function(outcome, num = "best") {
     ## Split data for required State
     outcome_data<-split(outcome_data, outcome_data$State)
     
+    ## lapply over each state's data
     result<-lapply(outcome_data,function(x) {
         x<-x[order(x[,2],x[,3], x[,1] ,decreasing=iOrder),]
-        c(Hospital=x[iRank,1], State=x[iRank,2])
+        c(hospital=x[iRank,1], state=x[iRank,2])
         })
     
+    ## recombine result to dataframe
     result<-data.frame(t(sapply(result,c)))
+    
+    ## Copy RowNames to fill missing state values
     result[,2]<-rownames(result)
     
     result
