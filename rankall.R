@@ -1,8 +1,9 @@
-rankhospital <- function(state, outcome, num = "best") {
+rankall <- function(outcome, num = "best") {
     ## Read outcome data
     ## Check that state and outcome are valid
-    ## Return hospital name in that state with the given rank
-    ## 30-day death rate
+    ## For each state, find the hospital of the given rank
+    ## Return a data frame with the hospital names and the
+    ## (abbreviated) state name
     
     intOutcome<-0
     
@@ -34,15 +35,6 @@ rankhospital <- function(state, outcome, num = "best") {
     ## Filter data to required Outcome Columns
     outcome_data<-myfiledata[,c(2, 7, intOutcome)]
     
-    ## Check if State Exists
-    state<-toupper(state)
-    if (any(outcome_data[,2]==state)==FALSE){
-        stop("invalid state")
-    }
-    
-    ## Filter data for required State
-    outcome_data<-outcome_data[outcome_data[,2]==state,]
-    
     ## Filter data for NA
     outcome_data<-outcome_data[outcome_data[,3]!="Not Available",]
     
@@ -50,8 +42,19 @@ rankhospital <- function(state, outcome, num = "best") {
     outcome_data[,3]<-as.numeric(outcome_data[,3])
     
     ## Order the data to Rank each Hospital in the dataset.
-    outcome_data<-outcome_data[order(outcome_data[,3], outcome_data[,1] ,decreasing=iOrder),]
+    outcome_data<-outcome_data[order(outcome_data[,2],outcome_data[,3], outcome_data[,1] ,decreasing=iOrder),]
     
-    outcome_data[iRank,1]
+    ## Split data for required State
+    outcome_data<-split(outcome_data, outcome_data$State)
+    
+    result<-lapply(outcome_data,function(x) {
+        x<-x[order(x[,2],x[,3], x[,1] ,decreasing=iOrder),]
+        c(Hospital=x[iRank,1], State=x[iRank,2])
+        })
+    
+    result<-data.frame(t(sapply(result,c)))
+    result[,2]<-rownames(result)
+    
+    result
 
 }
